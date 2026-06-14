@@ -73,6 +73,8 @@ app.post('/api/recognize', rateLimitMiddleware, async (req, res) => {
   }
 });
 
-app.listen(PORT, '127.0.0.1', () => {
-  console.log(`Guru Digital Classroom running at http://127.0.0.1:${PORT}`);
+const PORT = process.env.PORT || 10000;
+
+app.listen(PORT, () => {
+  console.log(`Guru Digital Classroom running on port ${PORT}`);
 });
