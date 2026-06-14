@@ -2,6 +2,8 @@ const express = require('express');
 const path = require('path');
 
 const app = express();
+
+// Use Render's assigned port, or 3000 when running locally
 const PORT = process.env.PORT || 3000;
 
 // Security headers
@@ -24,57 +26,81 @@ const MAX_REQUESTS_PER_WINDOW = 15;
 const rateLimitMiddleware = (req, res, next) => {
   const ip = req.ip || req.connection.remoteAddress;
   const now = Date.now();
+
   if (!rateLimitCache.has(ip)) {
     rateLimitCache.set(ip, []);
   }
-  const timestamps = rateLimitCache.get(ip).filter(time => now - time < RATE_LIMIT_WINDOW_MS);
+
+  const timestamps = rateLimitCache
+    .get(ip)
+    .filter(time => now - time < RATE_LIMIT_WINDOW_MS);
+
   timestamps.push(now);
   rateLimitCache.set(ip, timestamps);
 
   if (timestamps.length > MAX_REQUESTS_PER_WINDOW) {
-    return res.status(429).json({ error: 'Too many requests. Please slow down.' });
+    return res
+      .status(429)
+      .json({ error: 'Too many requests. Please slow down.' });
   }
+
   next();
 };
 
 // Limit request body size
 app.use(express.json({ limit: '2mb' }));
 
-// Serve the frontend (index.html, etc.) from this same directory
+// Serve frontend files
 app.use(express.static(__dirname));
 
-// Proxy endpoint: forwards ink data to Google's handwriting recognizer
+// Proxy endpoint
 app.post('/api/recognize', rateLimitMiddleware, async (req, res) => {
   try {
     // Input validation
-    if (!req.body || !req.body.requests || !Array.isArray(req.body.requests) || req.body.requests.length === 0) {
+    if (
+      !req.body ||
+      !req.body.requests ||
+      !Array.isArray(req.body.requests) ||
+      req.body.requests.length === 0
+    ) {
       return res.status(400).json({ error: 'Invalid request format.' });
     }
 
     const firstRequest = req.body.requests[0];
-    if (!firstRequest.ink || !Array.isArray(firstRequest.ink) || typeof firstRequest.language !== 'string') {
-      return res.status(400).json({ error: 'Invalid ink or language data.' });
+
+    if (
+      !firstRequest.ink ||
+      !Array.isArray(firstRequest.ink) ||
+      typeof firstRequest.language !== 'string'
+    ) {
+      return res
+        .status(400)
+        .json({ error: 'Invalid ink or language data.' });
     }
 
     const response = await fetch(
       'https://inputtools.google.com/request?ime=handwriting&app=mobilesearch&cs=1&oe=UTF-8',
       {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify(req.body)
       }
     );
 
     const data = await response.json();
     res.json(data);
+
   } catch (err) {
     console.error('Recognition proxy error:', err);
-    res.status(502).json({ error: 'Failed to reach handwriting recognition service.' });
+    res
+      .status(502)
+      .json({ error: 'Failed to reach handwriting recognition service.' });
   }
 });
 
-const PORT = process.env.PORT || 10000;
-
-app.listen(PORT, () => {
+// Start server
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Guru Digital Classroom running on port ${PORT}`);
 });
