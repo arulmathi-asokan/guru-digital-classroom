@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="ta" data-theme="light">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guru Digital Classroom — Digital Classroom</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Tamil:wght@400;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #f0f4f8;
+      --surface: #ffffff;
+      --surface-hover: #f8fafc;
+      --border: #e2e8f0;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --primary-light: #e0e7ff;
+      --secondary: #0ea5e9;
+      --success: #10b981;
+      --danger: #ef4444;
+      --canvas-bg: #ffffff;
+      --line-color: #cbd5e1;
+      --margin-color: #fca5a5;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --glass-bg: rgba(255, 255, 255, 0.85);
+      --glass-border: rgba(255, 255, 255, 0.3);
+    }
+
+    [data-theme="dark"] {
+      --bg-color: #0f172a;
+      --surface: #1e293b;
+      --surface-hover: #334155;
+      --border: #334155;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #6366f1;
+      --primary-hover: #818cf8;
+      --primary-light: #312e81;
+      --canvas-bg: #1e293b;
+      --line-color: #334155;
+      --margin-color: #7f1d1d;
+      --glass-bg: rgba(30, 41, 59, 0.85);
+      --glass-border: rgba(255, 255, 255, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', 'Noto Sans Tamil', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 24px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      z-index: 10;
+    }
+
+    .header-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-title h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .student-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-color);
+      padding: 4px 12px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+    }
+
+    .student-info input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text-main);
+      font-weight: 600;
+      font-family: inherit;
+      width: 140px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-main);
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .btn:hover {
+      background: var(--surface-hover);
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn-icon {
+      padding: 8px;
+    }
+
+    .btn-icon svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    /* Page Controls */
+    .page-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--surface);
+      padding: 4px 8px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    /* Main Workspace */
+    .workspace {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Left Sidebar / Toolbar */
+    .toolbar {
+      width: 72px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px 0;
+      gap: 16px;
+      z-index: 10;
+    }
+
+    .tool-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 16px;
+    }
+
+    .tool-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: all 0.2s;
+    }
+
+    .tool-btn:hover {
+      background: var(--surface-hover);
+      color: var(--primary);
+    }
+
+    .tool-btn.active {
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+
+    .tool-btn svg {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+    }
+
+    .color-picker {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .color-swatch {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .color-swatch:hover {
+      transform: scale(1.1);
+    }
+
+    .color-swatch.active {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--primary);
+    }
+
+    /* Canvas Area */
+    .canvas-container {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 24px;
+      display: flex;
+      justify-content: center;
+      background: var(--bg-color);
+      position: relative;
+    }
+
+    .board-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 1200px;
+      background: var(--canvas-bg);
+      border-radius: 16px;
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+      min-height: 1400px;
+      /* Tall canvas */
+    }
+
+    .canvas-bg-lines {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      touch-action: none;
+      cursor: crosshair;
+    }
+
+    /* Status Bar */
+    .status-bar {
+      padding: 8px 24px;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      z-index: 10;
+    }
+
+    .status-msg {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-msg.error {
+      color: var(--danger);
+    }
+
+    .status-msg.success {
+      color: var(--success);
+    }
+
+    .status-msg.info {
+      color: var(--primary);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    /* Language Dropdown */
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      margin-top: 8px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: var(--shadow-md);
+      z-index: 50;
+      width: 220px;
+      max-height: 300px;
+      display: none;
+      flex-direction: column;
+    }
+
+    .dropdown-menu input {
+      margin: 8px;
+      padding: 8px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg-color);
+      color: var(--text-main);
+      font-family: inherit;
+      outline: none;
+    }
+
+    .dropdown-menu ul {
+      list-style: none;
+      overflow-y: auto;
+      flex: 1;
+      padding: 0 0 8px 0;
+      margin: 0;
+    }
+
+    .dropdown-menu li {
+      padding: 8px 16px;
+      cursor: pointer;
+      color: var(--text-main);
+      transition: background 0.2s;
+      font-size: 0.9rem;
+    }
+
+    .dropdown-menu li:hover {
+      background: var(--surface-hover);
+    }
+
+    .dropdown-menu li.selected {
+      background: var(--primary-light);
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    /* Mobile Responsive Updates */
+    @media (max-width: 768px) {
+      header {
+        flex-wrap: wrap;
+        padding: 8px 12px;
+        gap: 8px;
+      }
+
+      .header-title h1 {
+        font-size: 1rem;
+      }
+
+      .header-actions {
+        width: 100%;
+        overflow-x: auto;
+        padding-bottom: 4px;
+      }
+
+      .btn {
+        font-size: 0.85rem;
+        padding: 6px 10px;
+        white-space: nowrap;
+      }
+
+      .page-controls {
+        order: -1;
+      }
+
+      .workspace {
+        flex-direction: column-reverse;
+      }
+
+      .toolbar {
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        border-right: none;
+        border-top: 1px solid var(--border);
+        padding: 8px;
+        overflow-x: auto;
+        justify-content: flex-start;
+      }
+
+      .tool-group {
+        flex-direction: row;
+        width: auto;
+        border-bottom: none;
+        border-right: 1px solid var(--border);
+        padding-bottom: 0;
+        padding-right: 12px;
+        margin-right: 12px;
+      }
+
+      .tool-group:last-child {
+        border-right: none;
+        margin-right: 0;
+        padding-right: 0;
+      }
+
+      .color-picker {
+        flex-direction: row;
+      }
+
+      .canvas-container {
+        padding: 12px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="header-title">
+      <svg viewBox="0 0 24 24" width="28" height="28" fill="var(--primary)">
+        <path d="M3 3h18v14H3z" opacity=".3" />
+        <path
+          d="M21 1H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h4v3h10v-3h4c1.1 0 2-.9 2-2V3c0-1.1-.9-2-2-2zm0 16H3V3h18v14z" />
+        <path d="M6 12h12v2H6zM6 9h12v2H6z" />
+      </svg>
+      <h1>Guru Tamil Whiteboard</h1>
+      <div class="student-info">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="var(--text-muted)">
+          <path
+            d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+        </svg>
+        <input type="text" id="studentName" placeholder="Student Name" maxlength="30">
+      </div>
+    </div>
+
+    <div class="page-controls">
+      <button class="btn btn-icon" id="prevPageBtn" title="Previous Page">
+        <svg viewBox="0 0 24 24">
+          <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+        </svg>
+      </button>
+      <span id="pageIndicator" style="font-weight: 600; min-width: 60px; text-align: center;">Page 1</span>
+      <button class="btn btn-icon" id="nextPageBtn" title="Next Page">
+        <svg viewBox="0 0 24 24">
+          <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+        </svg>
+      </button>
+      <button class="btn btn-icon" id="addPageBtn" title="New Page">
+        <svg viewBox="0 0 24 24">
+          <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="header-actions">
+      <div class="dropdown" id="langDropdown">
+        <button class="btn" id="langDropdownBtn">
+          🌍 <span id="currentLangLabel">Tamil</span>
+          <svg viewBox="0 0 24 24" width="16" height="16" style="margin-left: 4px; fill: currentColor;">
+            <path d="M7 10l5 5 5-5z" />
+          </svg>
+        </button>
+        <div class="dropdown-menu" id="langDropdownMenu">
+          <input type="text" id="langSearch" placeholder="Search language..." autocomplete="off">
+          <ul id="langList">
+            <li data-code="en">English</li>
+            <li data-code="hi">Hindi</li>
+            <li data-code="kn">Kannada</li>
+            <li data-code="ta" class="selected">Tamil</li>
+            <li data-code="te">Telugu</li>
+          </ul>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="recognizeBtn">✨ Recognize Now</button>
+      <button class="btn" id="exportPdfBtn">📄 Print PDF</button>
+      <button class="btn" id="exportPngBtn">🖼️ Save PNG</button>
+      <button class="btn btn-icon" id="themeToggleBtn" title="Toggle Dark Mode">
+        <svg viewBox="0 0 24 24" id="themeIcon">
+          <path
+            d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4C12.92 3.04 12.46 3 12 3zm0 16c-3.86 0-7-3.14-7-7s3.14-7 7-7c.48 0 .94.05 1.38.14-1.84 1.15-3.08 3.19-3.08 5.46 0 2.27 1.24 4.31 3.08 5.46-.44.09-.9.14-1.38.14z" />
+        </svg>
+      </button>
+      <button class="btn btn-icon" id="fullscreenBtn" title="Fullscreen">
+        <svg viewBox="0 0 24 24">
+          <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z" />
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="workspace">
+    <!-- Left Toolbar -->
+    <div class="toolbar">
+      <div class="tool-group">
+        <button class="tool-btn active" id="toolPen" title="Pen Tool (P)">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+          </svg>
+        </button>
+        <button class="tool-btn" id="toolHighlighter" title="Highlighter (H)">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M17.75 7L14 3.25l-10 10V17h3.75l10-10zm2.96-2.96c.39-.39.39-1.02 0-1.41L18.37.29c-.39-.39-1.02-.39-1.41 0L15 2.25 18.75 6l1.96-1.96z" />
+            <path fill-opacity=".36" d="M0 20h24v4H0z" />
+          </svg>
+        </button>
+        <button class="tool-btn" id="toolEraser" title="Eraser (E)">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M15.14 3c-.51 0-1.02.2-1.41.59L2.59 14.73c-.78.77-.78 2.04 0 2.83L5.03 20h7.1l9.28-9.29c.78-.77.78-2.04 0-2.83l-4.86-4.88c-.39-.39-.9-.59-1.41-.59zM11 18H5.85l-1.41-1.41 7.29-7.29 2.56 2.56L11 18z" />
+          </svg>
+        </button>
+        <div style="padding: 0 12px; width: 100%;">
+          <input type="range" id="penWidth" min="2" max="20" value="4" title="Stroke Thickness">
+        </div>
+      </div>
+
+      <div class="tool-group color-picker">
+        <div class="color-swatch active" style="background: #0f172a;" data-color="#0f172a"></div>
+        <div class="color-swatch" style="background: #ef4444;" data-color="#ef4444"></div>
+        <div class="color-swatch" style="background: #3b82f6;" data-color="#3b82f6"></div>
+        <div class="color-swatch" style="background: #10b981;" data-color="#10b981"></div>
+        <div class="color-swatch" style="background: #eab308;" data-color="#eab308"></div>
+        <div class="color-swatch" style="background: #ffffff; border: 1px solid var(--border);" data-color="#ffffff">
+        </div>
+      </div>
+
+      <div class="tool-group">
+        <button class="tool-btn" id="undoBtn" title="Undo (Ctrl+Z)">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z" />
+          </svg>
+        </button>
+        <button class="tool-btn" id="redoBtn" title="Redo (Ctrl+Y)">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M11.5 8c2.65 0 5.05.99 6.9 2.6L22 7v9h-9l3.62-3.62c-1.39-1.16-3.16-1.88-5.12-1.88-3.54 0-6.55 2.31-7.6 5.5l-2.37-.78C3.92 11.03 7.85 8 11.5 8z" />
+          </svg>
+        </button>
+        <button class="tool-btn" id="clearBtn" title="Clear Board">
+          <svg viewBox="0 0 24 24">
+            <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Canvas Container -->
+    <div class="canvas-container" id="scrollArea">
+      <div class="board-wrapper" id="boardWrapper">
+        <svg class="canvas-bg-lines" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="ruledLines" width="100" height="60" patternUnits="userSpaceOnUse">
+              <line x1="0" y1="60" x2="100" y2="60" stroke="var(--line-color)" stroke-width="1.5" />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#ruledLines)" />
+          <line x1="100" y1="0" x2="100" y2="100%" stroke="var(--margin-color)" stroke-width="2" />
+          <line x1="104" y1="0" x2="104" y2="100%" stroke="var(--margin-color)" stroke-width="0.5" />
+        </svg>
+        <canvas id="board"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="status-bar">
+    <div class="status-msg" id="status">Ready. Write on the board.</div>
+    <div>
+      Auto-convert delay:
+      <select id="delaySelect"
+        style="background:transparent; border:none; color:inherit; outline:none; font-family:inherit;">
+        <option value="0">Manual Only</option>
+        <option value="1200" selected>1.2s</option>
+        <option value="2000">2.0s</option>
+      </select>
+    </div>
+  </div>
+
+  <script>
+    const safeText = (element, text) => { element.textContent = text; };
+    const uuid = () => Math.random().toString(36).substring(2, 9);
+
+    // Theme Toggle
+    const htmlEl = document.documentElement;
+    let isDark = false;
+    document.getElementById('themeToggleBtn').addEventListener('click', () => {
+      isDark = !isDark;
+      htmlEl.setAttribute('data-theme', isDark ? 'dark' : 'light');
+      redraw();
+    });
+
+    // Language Dropdown Logic
+    let currentLang = 'ta';
+    const langDropdownBtn = document.getElementById('langDropdownBtn');
+    const langDropdownMenu = document.getElementById('langDropdownMenu');
+    const langSearch = document.getElementById('langSearch');
+    const langList = document.getElementById('langList');
+    const currentLangLabel = document.getElementById('currentLangLabel');
+
+    langDropdownBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isVisible = langDropdownMenu.style.display === 'flex';
+      langDropdownMenu.style.display = isVisible ? 'none' : 'flex';
+      if (!isVisible) {
+        langSearch.value = '';
+        langSearch.focus();
+        Array.from(langList.children).forEach(li => li.style.display = 'block');
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!langDropdownMenu.contains(e.target) && e.target !== langDropdownBtn) {
+        langDropdownMenu.style.display = 'none';
+      }
+    });
+
+    langSearch.addEventListener('input', (e) => {
+      const term = e.target.value.toLowerCase();
+      Array.from(langList.children).forEach(li => {
+        li.style.display = li.textContent.toLowerCase().includes(term) ? 'block' : 'none';
+      });
+    });
+
+    langList.addEventListener('click', (e) => {
+      if (e.target.tagName === 'LI') {
+        currentLang = e.target.getAttribute('data-code');
+        currentLangLabel.textContent = e.target.textContent;
+        Array.from(langList.children).forEach(li => li.classList.remove('selected'));
+        e.target.classList.add('selected');
+        langDropdownMenu.style.display = 'none';
+
+        // Update document title
+        document.title = `${e.target.textContent} Handwriting Board — Digital Classroom`;
+      }
+    });
+
+    // Fullscreen
+    document.getElementById('fullscreenBtn').addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(e => console.error(e));
+      } else {
+        document.exitFullscreen();
+      }
+    });
+
+    // Canvas Setup
+    const canvas = document.getElementById('board');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    const wrapper = document.getElementById('boardWrapper');
+
+    /* State Management */
+    let pages = [{ elements: [], history: [], redoStack: [] }];
+    let currentPageIndex = 0;
+
+    let currentTool = 'pen';
+    let currentColor = '#0f172a';
+    let currentWidth = 4;
+    let drawing = false;
+    let currentStroke = null;
+    let idleTimer = null;
+
+    function resizeCanvas() {
+      const rect = wrapper.getBoundingClientRect();
+      const ratio = window.devicePixelRatio || 1;
+      canvas.width = rect.width * ratio;
+      canvas.height = rect.height * ratio;
+      ctx.scale(ratio, ratio);
+      redraw();
+    }
+    window.addEventListener('load', resizeCanvas);
+    window.addEventListener('resize', resizeCanvas);
+
+    function getPage() { return pages[currentPageIndex]; }
+
+    function setStatus(msg, type = '') {
+      const el = document.getElementById('status');
+      safeText(el, msg);
+      el.className = 'status-msg ' + type;
+    }
+
+    function updatePageIndicator() {
+      safeText(document.getElementById('pageIndicator'), `Page ${currentPageIndex + 1}`);
+    }
+
+    // Action History System
+    function pushAction(action) {
+      const page = getPage();
+      page.history.push(action);
+      page.redoStack = []; // Clear redo stack on new action
+    }
+
+    function undo() {
+      const page = getPage();
+      const action = page.history.pop();
+      if (!action) return;
+      page.redoStack.push(action);
+
+      if (action.type === 'draw') {
+        page.elements = page.elements.filter(e => e.id !== action.element.id);
+      } else if (action.type === 'erase') {
+        page.elements.push(...action.removedElements);
+      } else if (action.type === 'recognize') {
+        page.elements = page.elements.filter(e => e.id !== action.addedText.id);
+        page.elements.push(...action.removedStrokes);
+      } else if (action.type === 'clear') {
+        page.elements = [...action.previousElements];
+      }
+      redraw();
+    }
+
+    function redo() {
+      const page = getPage();
+      const action = page.redoStack.pop();
+      if (!action) return;
+      page.history.push(action);
+
+      if (action.type === 'draw') {
+        page.elements.push(action.element);
+      } else if (action.type === 'erase') {
+        const ids = new Set(action.removedElements.map(e => e.id));
+        page.elements = page.elements.filter(e => !ids.has(e.id));
+      } else if (action.type === 'recognize') {
+        const ids = new Set(action.removedStrokes.map(e => e.id));
+        page.elements = page.elements.filter(e => !ids.has(e.id));
+        page.elements.push(action.addedText);
+      } else if (action.type === 'clear') {
+        page.elements = [];
+      }
+      redraw();
+    }
+
+    document.getElementById('undoBtn').addEventListener('click', undo);
+    document.getElementById('redoBtn').addEventListener('click', redo);
+
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        if (e.key === 'z') { e.preventDefault(); undo(); }
+        if (e.key === 'y') { e.preventDefault(); redo(); }
+      } else if (e.target.tagName !== 'INPUT') {
+        if (e.key.toLowerCase() === 'p') document.getElementById('toolPen').click();
+        if (e.key.toLowerCase() === 'h') document.getElementById('toolHighlighter').click();
+        if (e.key.toLowerCase() === 'e') document.getElementById('toolEraser').click();
+      }
+    });
+
+    function redraw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const elements = getPage().elements;
+
+      for (const el of elements) {
+        if (el.type === 'stroke') {
+          if (el.tool === 'highlighter') {
+            ctx.globalAlpha = 0.4;
+            ctx.globalCompositeOperation = isDark ? 'screen' : 'multiply';
+          } else {
+            ctx.globalAlpha = 1.0;
+            ctx.globalCompositeOperation = 'source-over';
+          }
+
+          ctx.lineWidth = el.width;
+          ctx.lineCap = 'round';
+          ctx.lineJoin = 'round';
+          ctx.strokeStyle = el.color;
+
+          if (el.points.length < 2) {
+            if (el.points.length === 1) {
+              ctx.beginPath();
+              ctx.arc(el.points[0].x, el.points[0].y, ctx.lineWidth / 2, 0, Math.PI * 2);
+              ctx.fillStyle = el.color;
+              ctx.fill();
+            }
+            continue;
+          }
+          ctx.beginPath();
+          ctx.moveTo(el.points[0].x, el.points[0].y);
+          for (let i = 1; i < el.points.length; i++) ctx.lineTo(el.points[i].x, el.points[i].y);
+          ctx.stroke();
+        } else if (el.type === 'text') {
+          ctx.globalAlpha = 1.0;
+          ctx.globalCompositeOperation = 'source-over';
+          ctx.font = `600 ${el.fontSize}px 'Noto Sans Tamil', 'Inter', sans-serif`;
+          ctx.fillStyle = el.color;
+          ctx.textBaseline = 'alphabetic';
+          ctx.fillText(el.text, el.x, el.y);
+        }
+      }
+      ctx.globalAlpha = 1.0;
+      ctx.globalCompositeOperation = 'source-over';
+    }
+
+    function getPos(e) {
+      const rect = canvas.getBoundingClientRect();
+      let x, y;
+      if (e.touches && e.touches.length) {
+        x = e.touches[0].clientX - rect.left;
+        y = e.touches[0].clientY - rect.top;
+      } else {
+        x = e.clientX - rect.left;
+        y = e.clientY - rect.top;
+      }
+      x = x * (canvas.width / window.devicePixelRatio / rect.width);
+      y = y * (canvas.height / window.devicePixelRatio / rect.height);
+      return { x, y };
+    }
+
+    function startDraw(e) {
+      if (e.target !== canvas) return;
+      e.preventDefault();
+      if (idleTimer) clearTimeout(idleTimer);
+      drawing = true;
+      const p = getPos(e);
+
+      if (currentTool === 'eraser') {
+        eraseAt(p);
+        return;
+      }
+
+      let colorToUse = currentColor;
+      let widthToUse = currentWidth;
+
+      if (currentTool === 'highlighter') {
+        widthToUse = currentWidth * 3;
+        ctx.globalAlpha = 0.4;
+        ctx.globalCompositeOperation = isDark ? 'screen' : 'multiply';
+      } else {
+        ctx.globalAlpha = 1.0;
+        ctx.globalCompositeOperation = 'source-over';
+        if (isDark && currentColor === '#0f172a') colorToUse = '#f8fafc';
+        if (!isDark && currentColor === '#ffffff') colorToUse = '#0f172a';
+      }
+
+      currentStroke = {
+        type: 'stroke', id: uuid(), tool: currentTool, color: colorToUse,
+        width: widthToUse, points: [{ x: p.x, y: p.y, t: Date.now() }]
+      };
+
+      ctx.lineWidth = widthToUse;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.strokeStyle = colorToUse;
+
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y);
+      ctx.lineTo(p.x, p.y);
+      ctx.stroke();
+    }
+
+    function moveDraw(e) {
+      if (!drawing) return;
+      e.preventDefault();
+      const p = getPos(e);
+
+      if (currentTool === 'eraser') {
+        eraseAt(p);
+        return;
+      }
+
+      const last = currentStroke.points[currentStroke.points.length - 1];
+      ctx.beginPath();
+      ctx.moveTo(last.x, last.y);
+      ctx.lineTo(p.x, p.y);
+      ctx.stroke();
+      currentStroke.points.push({ x: p.x, y: p.y, t: Date.now() });
+    }
+
+    function endDraw(e) {
+      if (!drawing) return;
+      drawing = false;
+      if (currentTool === 'eraser') return;
+
+      if (currentStroke && currentStroke.points.length > 0) {
+        getPage().elements.push(currentStroke);
+        pushAction({ type: 'draw', element: currentStroke });
+        redraw();
+      }
+      currentStroke = null;
+
+      const delay = parseInt(document.getElementById('delaySelect').value, 10);
+      if (delay > 0) {
+        if (idleTimer) clearTimeout(idleTimer);
+        setStatus('Waiting to recognize...', 'info');
+        idleTimer = setTimeout(runRecognition, delay);
+      } else {
+        setStatus('Ready', '');
+      }
+    }
+
+    function eraseAt(p) {
+      const page = getPage();
+      const eraseRadius = 25;
+      const removed = [];
+
+      for (let i = page.elements.length - 1; i >= 0; i--) {
+        const el = page.elements[i];
+        let hit = false;
+
+        if (el.type === 'stroke') {
+          for (const pt of el.points) {
+            const dx = pt.x - p.x;
+            const dy = pt.y - p.y;
+            if (Math.sqrt(dx * dx + dy * dy) < eraseRadius) { hit = true; break; }
+          }
+        } else if (el.type === 'text') {
+          // Approximate bounding box for text
+          ctx.font = `600 ${el.fontSize}px 'Noto Sans Tamil', 'Inter', sans-serif`;
+          const metrics = ctx.measureText(el.text);
+          const width = metrics.width;
+          const height = el.fontSize;
+          const x1 = el.x;
+          const y1 = el.y - height; // baseline offset approximation
+          const x2 = el.x + width;
+          const y2 = el.y + (height * 0.2); // descender allowance
+
+          // Expand bounding box slightly by eraseRadius
+          if (p.x >= x1 - eraseRadius && p.x <= x2 + eraseRadius &&
+            p.y >= y1 - eraseRadius && p.y <= y2 + eraseRadius) {
+            hit = true;
+          }
+        }
+
+        if (hit) {
+          removed.push(el);
+          page.elements.splice(i, 1);
+        }
+      }
+
+      if (removed.length > 0) {
+        pushAction({ type: 'erase', removedElements: removed });
+        redraw();
+      }
+    }
+
+    canvas.addEventListener('mousedown', startDraw);
+    canvas.addEventListener('mousemove', moveDraw);
+    window.addEventListener('mouseup', endDraw);
+    canvas.addEventListener('touchstart', startDraw, { passive: false });
+    canvas.addEventListener('touchmove', moveDraw, { passive: false });
+    window.addEventListener('touchend', endDraw, { passive: false });
+
+    // Toolbar Actions
+    document.querySelectorAll('.tool-btn[id^="tool"]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.tool-btn[id^="tool"]').forEach(b => b.classList.remove('active'));
+        e.currentTarget.classList.add('active');
+        currentTool = e.currentTarget.id.replace('tool', '').toLowerCase();
+      });
+    });
+
+    document.querySelectorAll('.color-swatch').forEach(swatch => {
+      swatch.addEventListener('click', (e) => {
+        document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+        e.currentTarget.classList.add('active');
+        currentColor = e.currentTarget.getAttribute('data-color');
+        document.getElementById('toolPen').click();
+      });
+    });
+
+    document.getElementById('penWidth').addEventListener('input', (e) => {
+      currentWidth = parseInt(e.target.value, 10);
+    });
+
+    document.getElementById('clearBtn').addEventListener('click', () => {
+      const page = getPage();
+      if (page.elements.length > 0) {
+        pushAction({ type: 'clear', previousElements: [...page.elements] });
+        page.elements = [];
+        redraw();
+        setStatus('Board cleared.', '');
+      }
+    });
+
+    // Pagination
+    document.getElementById('addPageBtn').addEventListener('click', () => {
+      if (pages.length >= 10) return alert('Maximum 10 pages allowed.');
+      pages.push({ elements: [], history: [], redoStack: [] });
+      currentPageIndex = pages.length - 1;
+      updatePageIndicator();
+      redraw();
+    });
+    document.getElementById('prevPageBtn').addEventListener('click', () => {
+      if (currentPageIndex > 0) { currentPageIndex--; updatePageIndicator(); redraw(); }
+    });
+    document.getElementById('nextPageBtn').addEventListener('click', () => {
+      if (currentPageIndex < pages.length - 1) { currentPageIndex++; updatePageIndicator(); redraw(); }
+    });
+
+    // Recognition Logic (In-Place)
+    document.getElementById('recognizeBtn').addEventListener('click', runRecognition);
+
+    let busy = false;
+    async function runRecognition() {
+      const page = getPage();
+      // Filter strokes that are standard pens (not highlighters)
+      const targetStrokes = page.elements.filter(el => el.type === 'stroke' && el.tool === 'pen');
+      if (targetStrokes.length === 0 || busy) return;
+
+      busy = true;
+      setStatus('Converting to text...', 'info');
+
+      try {
+        // Calculate bounding box
+        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+        targetStrokes.forEach(s => {
+          s.points.forEach(p => {
+            minX = Math.min(minX, p.x); minY = Math.min(minY, p.y);
+            maxX = Math.max(maxX, p.x); maxY = Math.max(maxY, p.y);
+          });
+        });
+
+        const t0 = targetStrokes[0].points[0].t;
+        const ink = targetStrokes.map(s => [
+          s.points.map(p => Math.round(p.x)),
+          s.points.map(p => Math.round(p.y)),
+          s.points.map(p => p.t - t0)
+        ]);
+
+        const reqBody = {
+          requests: [{
+            writing_guide: {
+              writing_area_width: Math.round(canvas.width),
+              writing_area_height: Math.round(canvas.height)
+            },
+            ink: ink,
+            language: currentLang
+          }]
+        };
+
+        const resp = await fetch('/api/recognize', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(reqBody)
+        });
+
+        if (resp.status === 429) throw new Error('Too many requests. Slow down.');
+        if (!resp.ok) throw new Error('Server error ' + resp.status);
+
+        const data = await resp.json();
+        if (data && data.error) throw new Error(data.error);
+
+        if (data && data[0] === 'SUCCESS' && data[1] && data[1][0] && data[1][0][1] && data[1][0][1].length) {
+          const bestMatch = data[1][0][1][0];
+
+          // Remove strokes, add Text element
+          const idsToRemove = new Set(targetStrokes.map(s => s.id));
+          page.elements = page.elements.filter(el => !idsToRemove.has(el.id));
+
+          const height = maxY - minY;
+          const fontSize = Math.max(24, Math.min(height * 0.9, 120)); // Auto-scale font
+          const majorityColor = targetStrokes[targetStrokes.length - 1].color;
+
+          const textEl = {
+            type: 'text', id: uuid(), text: bestMatch,
+            x: minX, y: maxY, // Align baseline to bottom of scribble
+            fontSize: fontSize, color: majorityColor
+          };
+
+          page.elements.push(textEl);
+          pushAction({ type: 'recognize', removedStrokes: targetStrokes, addedText: textEl });
+          redraw();
+          setStatus('Converted successfully.', 'success');
+        } else {
+          setStatus('Could not recognize text.', 'error');
+        }
+      } catch (err) {
+        setStatus('Error: ' + err.message, 'error');
+      } finally {
+        busy = false;
+      }
+    }
+
+    // Export functions
+    document.getElementById('exportPngBtn').addEventListener('click', () => {
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = canvas.width;
+      tempCanvas.height = canvas.height;
+      const tCtx = tempCanvas.getContext('2d');
+
+      tCtx.fillStyle = '#ffffff';
+      tCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+      tCtx.drawImage(canvas, 0, 0);
+
+      const studentName = document.getElementById('studentName').value.trim() || 'student';
+      const a = document.createElement('a');
+      a.href = tempCanvas.toDataURL('image/png');
+      a.download = `whiteboard_${studentName}_page${currentPageIndex + 1}.png`;
+      a.click();
+    });
+
+    document.getElementById('exportPdfBtn').addEventListener('click', () => {
+      window.print();
+    });
+
+  </script>
+
+</body>
+
+</html>
